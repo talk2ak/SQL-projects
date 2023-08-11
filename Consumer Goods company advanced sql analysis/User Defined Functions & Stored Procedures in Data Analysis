@@ -1,33 +1,34 @@
-use gdb0041;
+
+/*  For a Consumer Goods company, Sales Data Analysis was performed using User Defined Function and Stored Procedures.
+
+Problem 1:
+
+Here, an Aggregate monthly sales report is generated for croma india customer (customer_code = 90002002). so that we can track how much sales 
+this particular customer is generating.
+
+Task 1: The report fields 1. Month, 2. Product name, 3. Variant, 4. Sold Quantity, 5. Gross price per Item, 6. Gross price Total 
+
+Task 2: The report fields: 1. Month, 2. Total gross sales amount to croma india this month.
+
+*/
 
 ###### USER DEFINED FUNCTION ##########
 
-/*  Problem: 1 -
-As a product owner, I want to generate a report of individual product sales (aggregated on a monthly basis at the product code level) 
-for Croma India customer for FY = 2021 so that I can track individual product sales.
-The report should have the following fields
-1. Month
-2. Product name
-3. Variant
-4. Sold Quantity
-5. Gross price per Item
-6. Gross price Total 
-*/
-
 select distinct * 
 from dim_customer
-where customer like '%croma%' and market ='india'
-;
+where customer like '%croma%' and market ='india';
+
 
 -- Getting fiscal year calculation. 
 select * 
 from fact_sales_monthly
 where customer_code = 90002002 and 
 year(date_add(date, interval 4 month)) = 2021
-order by date desc
-;
+order by date desc;
+
 
 # Now we will create a function to get fiscal year date
+
 delimiter &&
 create function get_fiscal_year(calender_date date) 		
     returns int											
@@ -40,7 +41,9 @@ return fiscal_year;
 end &&
 delimiter ;
 
+
 # Let us use above created function in our query
+
 select * 
 from fact_sales_monthly
 where customer_code = 90002002 and 
@@ -49,8 +52,7 @@ order by date asc;
 
 
 
-# Additional Exercise: Writing Quarter function -
-select month("2019-09-9");
+# Similarly, Writing a Quarter user defined function -
 
 delimiter &&
 create function get_fiscal_quarter( calender_date date)
@@ -74,7 +76,10 @@ return qtr;
 end &&
 delimiter ;
 
-# Additional Exercise: Now using the above get_fiscal_quarter function as a condition to further refine search
+
+
+# Now using the above get_fiscal_quarter function as a condition to further refine search
+
 select * 
 from fact_sales_monthly
 where customer_code = 90002002 and 
@@ -82,7 +87,8 @@ get_fiscal_year(date) = 2021 and get_fiscal_quarter(date) = "q4"
 order by date desc;
 
 
-# getting details from product table -- final query to find the solution of problem 1
+# getting details from product table using above functions
+
 select 
 	s.date, s.product_code, product, variant, s.sold_quantity, 
     g.gross_price,
@@ -96,6 +102,9 @@ where
 	get_fiscal_year(date) = 2021
 order by date asc
 limit 100;
+
+
+
 
 /* Problem:2 -
 As a product owner, I need an aggregate monthly sales report for croma india customer so that i can track how much sales this particular customer is generating for 
@@ -119,7 +128,7 @@ group by s.date
 order by s.date asc;
 
 
-# Similarly do this Exercise: Yearly Sales Report --> Generate a yearly report for Croma India where there are two columns:
+# Yearly Sales Report --> Yearly sales report for Croma India where there are two columns:
 -- 1. Fiscal Year
 -- 2. Total Gross Sales amount In that year from Croma
 
@@ -134,6 +143,8 @@ on
 where customer_code = 90002002
 group by fiscal_year_re
 order by fiscal_year_re asc;
+
+
 
 
 
@@ -161,23 +172,17 @@ order by s.date asc;
 end $$
 delimiter ;
 
+
 -- calling the above stored procedure for croma india having customer_code= 90002002
 call gdb0041.get_monthly_gross_sale_for_customer(90002002);
 
 
--- Now, we can extract any data for a given customer code 
-select distinct customer_code, customer 
-from dim_customer;
+-- Now, we can extract any data for a given customer code and checking it.
 
 select *
 from dim_customer
 where customer like '%amazon%' and market = 'india';
 
-
--- FIND_IN_SET Function -> it returns the position of the text in a set
-select find_in_set(200, "300,100,400,250,560,200");
-
-select find_in_set(250, "300,100,400,250,560,200");
 
 
 -- now lets create the stored procedure- which can take multiple customer codes
@@ -205,6 +210,7 @@ order by s.date asc;
 
 end $$
 delimiter ;
+
 
 -- lets call the above created procedure for multiple customer codes like in the case of amazon.
 
@@ -239,6 +245,8 @@ join dim_customer c
 where 
 	get_fiscal_year(s.date) = 2021 and market = 'India'
 group by c.market;
+
+
 
 # Now creating the stored procedure 
 
