@@ -3,7 +3,7 @@
 
 
 /*  Problem Statement: A Market Survey was conducted by a Marketing team, of a fictitious Food & Beverage company CodeX. 
-						Which is going to launch a Energy Drink. And Initially test launched a product in ten cities of India, to understand customer behaviour.
+			Which is going to launch a Energy Drink. And Initially test launched a product in ten cities of India, to understand customer behaviour.
 	
 Approach: Following analysis is done through SQL queries- 1. Demographic Insights, 2. Consumer Preferences, 3. Competition Analysis, 
 			4. Marketing Channel and Brand awareness, 5. Brand Penetration, 6. Purchase Behaviour and 7. Product Development
